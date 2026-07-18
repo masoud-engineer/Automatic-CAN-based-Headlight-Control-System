@@ -46,7 +46,7 @@ The ESP32-CAM performs **image acquisition and brightness measurement only**. Al
 - Executes the vehicle detection algorithm.
 - Controls high beam and low beam operation.
 - Performs system diagnostics.
-- Stores and clears Diagnostic Trouble Codes (DTCs).
+- Stores CAN communication timeout DTC.
 - Displays system information through the LCD.
 
 The Arduino acts as the main **Electronic Control Unit (ECU)** responsible for system decision-making.
@@ -58,8 +58,8 @@ The Arduino acts as the main **Electronic Control Unit (ECU)** responsible for s
 ### Functions:
 - Sends CAN diagnostic commands.
 - Performs headlight actuator tests.
-- Retrieves Diagnostic Trouble Codes.
-- Clears stored Diagnostic Trouble Codes.
+- Retrieves Diagnostic Trouble Code.
+- Clears stored Diagnostic Trouble Code.
 - Requests ECU information.
 - Initiates camera communication tests.
 
@@ -146,8 +146,8 @@ CANHacker V2.00.01 is used together with the CAN Diagnostic Node to:
 - Monitor CAN bus communication.
 - Transmit diagnostic commands.
 - Perform actuator tests.
-- Retrieve Diagnostic Trouble Codes.
-- Clear Diagnostic Trouble Codes.
+- Retrieve Diagnostic Trouble Code.
+- Clear Diagnostic Trouble Code.
 - Display ECU information.
 - Verify camera communication.
 
@@ -160,8 +160,8 @@ CANHacker V2.00.01 is used together with the CAN Diagnostic Node to:
 | 0x101 | High beam actuator test |
 | 0x102 | Low beam actuator test |
 | 0x103 | Lights OFF actuator test |
-| 0x104 | Retrieve DTCs |
-| 0x105 | Clear DTCs |
+| 0x104 | Retrieve DTC |
+| 0x105 | Clear DTC |
 | 0x106 | Display ECU information |
 | 0x107 | Camera communication test |
 | 0x201 | ECU status broadcast |
