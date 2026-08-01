@@ -1,214 +1,282 @@
-# Smart Vehicle Headlight Control System Using CAN Bus
+CAN-Based Vision-Assisted Smart Vehicle Headlight Control System
 
-## Overview
+Overview
 
-This project presents a **CAN-based Smart Vehicle Headlight Control System** developed to improve driving safety by automatically controlling vehicle headlights according to ambient lighting conditions while preventing glare to oncoming drivers during night driving.
+The CAN-Based Vision-Assisted Smart Vehicle Headlight Control System is a distributed embedded automotive lighting prototype developed as a Bachelor of Science in Automobile Engineering final-year project.
 
-The system uses an **LDR sensor** to determine ambient lighting conditions (**Day, Dim, and Night**). An **ESP32-CAM** continuously analyses a selected region of the road scene and computes two image brightness parameters:
+The project demonstrates the implementation of an intelligent vehicle lighting system using Controller Area Network (CAN) communication, embedded control and computer vision. The system automatically controls vehicle headlight operation according to ambient lighting conditions and approaching vehicle headlights while providing diagnostic capabilities and communication fault management.
 
-- **BrightAvg** – Average brightness value of the selected Region of Interest (ROI)
-- **BrightCount** – Number of detected bright pixels in the ROI
-
-These parameters are transmitted over the **CAN bus** to the Arduino-based **Electronic Control Unit (ECU)**, where the vehicle detection algorithm is executed during night operation only.
+Unlike conventional academic prototypes that combine sensing and control within a single controller, this project adopts a distributed Electronic Control Unit (ECU) architecture, closely resembling the design philosophy used in modern vehicles.
 
 ---
 
-# System Architecture
+Project Objectives
 
-The system consists of three CAN bus nodes:
+The project was developed to:
 
-## 1. CAM Vision Node (ESP32-CAM)
-
-### Functions:
-- Captures grayscale images.
-- Analyses predefined Region of Interest (ROI).
-- Calculates image brightness parameters:
-  - Average brightness
-  - Bright pixel count
-- Transmits brightness data through the CAN bus.
-- Responds to camera communication test requests.
-
-The ESP32-CAM performs **image acquisition and brightness measurement only**. All decision-making is performed by the Arduino ECU.
+- Design a distributed CAN-based vehicle headlight control system.
+- Develop a Vision Node capable of extracting image brightness parameters from camera images.
+- Implement automatic Day, Dim and Night headlight operation.
+- Detect approaching vehicle headlights using image brightness analysis.
+- Automatically switch between High Beam and Low Beam.
+- Implement startup self-test and continuous communication supervision.
+- Develop CAN-based diagnostic functions.
+- Improve vehicle lighting safety using low-cost embedded hardware.
 
 ---
 
-## 2. Arduino Headlight Control ECU
+System Architecture
 
-### Functions:
-- Reads ambient light intensity using the LDR sensor.
-- Determines operating mode:
-  - Day mode
-  - Dim mode
-  - Night mode
-- Receives BrightAvg and BrightCount values from the ESP32-CAM.
-- Filters received brightness data.
-- Calculates brightness variation (Delta).
-- Executes the vehicle detection algorithm.
-- Controls high beam and low beam operation.
-- Performs system diagnostics.
-- Stores CAN communication timeout DTC.
-- Displays system information through the LCD.
+The system consists of three independent nodes connected through the Controller Area Network (CAN).
 
-The Arduino acts as the main **Electronic Control Unit (ECU)** responsible for system decision-making.
+Vehicle Battery
+       │
+       ▼
+ Buck Converter
+       │
+ ┌───────────────┐
+ │ Headlight ECU │◄────────────┐
+ └───────────────┘             │
+       │                       │
+       │ CAN Bus               │
+       ▼                       │
+ ┌───────────────┐             │
+ │ Vision Node   │─────────────┘
+ │ (ESP32-CAM)   │
+ └───────────────┘
 
----
+       ▲
+       │
+CANHacker Diagnostic Node
 
-## 3. CAN Diagnostic Node
-
-### Functions:
-- Sends CAN diagnostic commands.
-- Performs headlight actuator tests.
-- Retrieves Diagnostic Trouble Code.
-- Clears stored Diagnostic Trouble Code.
-- Requests ECU information.
-- Initiates camera communication tests.
+Each node performs an independent function while exchanging information over the CAN bus.
 
 ---
 
-# Operating Principle
+System Description
 
-The LDR continuously measures ambient lighting intensity.
+1. Vision Node (ESP32-CAM)
 
-The Arduino ECU determines the current lighting condition:
+The Vision Node continuously captures grayscale images using the ESP32-CAM module.
 
-### Day Mode
-- Headlights remain OFF.
+A predefined Region of Interest (ROI) is processed to compute:
 
-### Dim Mode
-- Low beam headlights are activated.
+- brightAvg — Average image brightness
+- brightCount — Number of bright pixels
 
-### Night Mode
-- High beam headlights are activated.
-- ESP32-CAM brightness data is processed to detect approaching vehicles.
+Only these two parameters are transmitted through the CAN bus.
 
-When an approaching vehicle is detected:
+«Important
 
-- High beam is switched OFF.
-- Low beam is activated to prevent glare.
+The Vision Node does not perform vehicle detection.
+It only extracts image brightness information.»
 
-When the vehicle is no longer detected:
+Additional responsibilities include:
 
-- High beam operation is automatically restored.
-
----
-
-# Main Features
-
-- Automatic day, dim, and night headlight control.
-- Automatic high beam and low beam switching.
-- Oncoming vehicle detection during night driving.
-- CAN bus communication between all system nodes.
-- Manual high beam override.
-- CAN communication fault detection.
-- Fail-safe low beam operation.
-- ECU startup self-test.
-- Camera communication verification.
-- High beam actuator test.
-- Low beam actuator test.
-- Lights OFF actuator test.
-- Diagnostic Trouble Code (DTC) retrieval.
-- Diagnostic Trouble Code (DTC) clearing.
-- ECU information display.
-- LCD-based Human Machine Interface (HMI).
+- Startup acknowledgement
+- Continuous communication acknowledgement
+- Camera health monitoring
+- Watchdog recovery
 
 ---
 
-# Hardware Components
+2. Headlight Electronic Control Unit (Arduino Uno)
+
+The Headlight ECU is the central decision-making controller.
+
+It receives:
+
+- LDR sensor value
+- brightAvg
+- brightCount
+
+The ECU performs:
+
+- Ambient light classification
+- Vehicle detection
+- Automatic headlight switching
+- Startup vision self-test
+- Continuous Vision Node supervision
+- CAN communication timeout detection
+- Manual override
+- Diagnostic processing
+- Safe-mode operation
+- LCD information display
+
+---
+
+3. Diagnostic Node
+
+The Diagnostic Node is implemented using CANHacker software.
+
+Its purpose is to:
+
+- Send diagnostic requests
+- Monitor CAN traffic
+- Verify Vision Node communication
+- Perform actuator testing
+- Display system information
+- Retrieve and clear diagnostic trouble codes
+
+---
+
+Operating Principle
+
+1. Vehicle ignition is switched ON.
+
+2. The Headlight ECU performs startup initialization.
+
+3. A CAN handshake request is transmitted to the Vision Node.
+
+4. The Vision Node acknowledges successful communication.
+
+5. Normal operation begins.
+
+6. The Vision Node continuously transmits:
+   
+   - brightAvg
+   - brightCount
+
+7. The Headlight ECU reads the ambient light level from the LDR sensor.
+
+8. After confirmation timing, the ECU determines whether the environment is:
+   
+   - Day
+   - Dim
+   - Night
+
+9. During confirmed Night operation, the ECU analyses brightAvg and brightCount using the implemented vehicle detection state machine.
+
+10. If an approaching vehicle is detected:
+
+- High Beam switches OFF.
+- Low Beam switches ON.
+
+11. After the approaching vehicle disappears and confirmation conditions are satisfied:
+
+- High Beam is restored automatically.
+
+12. Throughout system operation, communication supervision continues in the background.
+
+---
+
+Safety Features
+
+The system incorporates several safety mechanisms:
+
+- Startup Vision Node self-test
+- Continuous communication supervision
+- Camera health monitoring
+- CAN timeout detection
+- Automatic Safe Low Beam mode
+- Manual override
+- Software Watchdog Timer
+- Diagnostic Trouble Code (DTC) support
+
+These features improve overall system reliability and fault tolerance.
+
+---
+
+CAN Communication
+
+Vision Node → Headlight ECU
+
+CAN ID| Data| Description
+0x201| brightAvg, brightCount| Image brightness parameters
+0x207| ACK| Vision Node acknowledgement
+
+---
+
+Headlight ECU → Vision Node
+
+CAN ID| Function
+0x301| Startup handshake request
+0x302| Continuous communication supervision request
+
+---
+
+Diagnostic Commands
+
+CAN ID| Command| Function
+0x101| High Beam Test| Activates High Beam relay for actuator verification.
+0x102| Low Beam Test| Activates Low Beam relay for actuator verification.
+0x103| Lights OFF Test| Turns OFF both relays for output verification.
+0x104| Read Diagnostic Trouble Codes| Displays stored ECU faults.
+0x105| Clear Diagnostic Trouble Codes| Clears stored faults from memory.
+0x106| ECU Information| Displays ECU firmware information.
+0x107| Vision Communication Test| Verifies Vision Node communication.
+0x108| Vision Parameters Display| Displays LDR value, brightAvg and brightCount on the LCD.
+
+---
+
+Hardware Components
 
 - ESP32-CAM (AI Thinker)
 - Arduino Uno
 - MCP2515 CAN Bus Modules
-- 16×2 I2C LCD
 - LDR Sensor
+- 16×2 I2C LCD
 - Relay Module
-- LED Vehicle Headlight
-- DC Buck Converter
-- 12V Battery
+- LED Vehicle Headlamp
+- Manual Override Switch
+- DC-DC Buck Converter
+- 12 V Power Supply
 
 ---
 
-# Software Tools
+Software
 
 - Arduino IDE
 - ESP32 Board Package
 - MCP_CAN Library
-- arduino-canhacker Library
 - LiquidCrystal_I2C Library
-- CANHacker V2.00.01
-- GitHub
+- CANHacker
 
 ---
 
-# CANHacker V2.00.01
+Repository Structure
 
-CANHacker V2.00.01 is used together with the CAN Diagnostic Node to:
+Documentation/
+Headlight_ECU/
+Vision_Node/
+Diagnostic_Node/
+Hardware/
+Images/
+Videos/
+README.md
 
-- Monitor CAN bus communication.
-- Transmit diagnostic commands.
-- Perform actuator tests.
-- Retrieve Diagnostic Trouble Code.
-- Clear Diagnostic Trouble Code.
-- Display ECU information.
-- Verify camera communication.
-
----
-
-# CAN Diagnostic Commands
-
-| CAN ID | Function |
-|--------|----------|
-| 0x101 | High beam actuator test |
-| 0x102 | Low beam actuator test |
-| 0x103 | Lights OFF actuator test |
-| 0x104 | Retrieve DTC |
-| 0x105 | Clear DTC |
-| 0x106 | Display ECU information |
-| 0x107 | Camera communication test |
-| 0x201 | ECU status broadcast |
-| 0x207 | Camera acknowledgement |
+Each directory contains the documentation, source code and supporting files relevant to that subsystem.
 
 ---
 
-# Repository Contents
+Future Improvements
 
-This repository contains:
+Potential future enhancements include:
 
-- Arduino Headlight Control ECU software
-- ESP32-CAM Vision Node software
-- CAN Diagnostic Node software
-- Circuit diagrams
-- Project documentation
-- Images
-- Demonstration materials
-
----
-
-# Applications
-
-- Intelligent automotive lighting systems
-- Automatic headlight control systems
-- CAN bus embedded systems
-- Automotive electronics
-- Educational and research projects
-
----
-
-# Future Improvements
-
-Possible future developments include:
-
+- Artificial Intelligence (AI) based vehicle recognition.
 - Adaptive threshold calibration.
 - Rain and fog compensation.
 - Steering angle adaptive lighting.
 - Vehicle speed integration.
-- Persistent DTC storage using EEPROM.
+- Integration with production automotive CAN networks.
+- Dedicated PC diagnostic application.
 
 ---
 
-# Author
+Author
 
-**Masoud M. Subi**  
-Bachelor's Degree in Automobile Engineering  
+Masoud M. Subi
 
-**Project Title:**  
-Smart Vehicle Headlight Control System Using CAN Bus
+Bachelor of Science in Automobile Engineering
+
+National Institute of Transport (NIT)
+
+2026
+
+---
+
+License
+
+This repository has been developed for academic and research purposes.
+
+Permission should be obtained from the author before reproduction, redistribution or commercial application of any part of this work.
