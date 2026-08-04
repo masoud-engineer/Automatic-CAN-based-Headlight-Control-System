@@ -223,6 +223,12 @@ Potential future enhancements include:
 - Dedicated PC diagnostic application
 
 ---
+## Documentation
+
+The complete project report is available in the **Releases** section of this repository.
+
+**Latest Release:**  
+https://github.com/USERNAME/REPOSITORY/releases/latest
 
 # Author
 
