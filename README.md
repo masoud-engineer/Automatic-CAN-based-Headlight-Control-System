@@ -228,8 +228,7 @@ Potential future enhancements include:
 The complete project report is available in the **Releases** section of this repository.
 
 **Latest Release:**  
-[[https://github.com/USERNAME/REPOSITORY/releases/latest](https://github.com/masoud-engineer/Automatic-CAN-based-Headlight-Control-System)
-](https://github.com/masoud-engineer/Automatic-CAN-based-Headlight-Control-System/tree/v1.0)
+https://github.com/masoud-engineer/Automatic-CAN-based-Headlight-Control-System/releases/download/v1.0/Final.Project.Report.pdf
 # Author
 
 **Masoud M. Subi**
