@@ -229,6 +229,13 @@ The complete project report is available in the **Releases** section of this rep
 
 **Latest Release:**  
 https://github.com/masoud-engineer/Automatic-CAN-based-Headlight-Control-System/releases/download/v1.0/Final.Project.Report.pdf
+
+## Demonstration Video
+
+Watch the complete system demonstration here:
+
+https://youtube.com/shorts/xQdj2KzUrXE?si=wS7PGeulxvVxhk3e
+
 # Author
 
 **Masoud M. Subi**
